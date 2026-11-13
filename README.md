@@ -123,14 +123,13 @@ Yönergedeki "ekstra paket kullanılmaz" kuralına karşın aşağıdaki paketle
 **Gereksinimler:** Flutter 3.47.8 (veya uyumlu bir sürüm), Android Studio / VS Code, Android emülatörü ya da cihaz, bir Firebase projesi.
 
 ```bash
-git clone https://github.com/Berdowski22/YollaGelsin.git
-cd YollaGelsin
+git clone https://github.com/Berdowski22/ProBuy.git
+cd ProBuy
 flutter pub get
-# Firebase kurulumunu tamamladıktan sonra:
 flutter run
 ```
 
-> ⚠️ `google-services.json` dosyası depoda **bulunmaz**. Çalıştırmadan önce aşağıdaki Firebase adımlarını uygulayın.
+> ℹ️ `android/app/google-services.json` dosyası bu depoya eklenmiştir; ayrıca indirip kopyalamanız gerekmez. Bu dosya Firebase istemci yapılandırmasıdır, sunucu gizli anahtarı değildir. Firebase API anahtarını kısıtlayın ve Firestore'u güvenli kurallarla koruyun; istemci yapılandırmasının herkese açık olması veritabanı kurallarının yerini tutmaz.
 
 > 💡 Proje yolunda Türkçe karakter varsa `flutter analyze` hata verebilir; bu durumda `dart analyze lib` kullanın.
 
@@ -140,9 +139,9 @@ flutter run
 
 1. [Firebase Console](https://console.firebase.google.com)'da yeni bir proje oluşturun.
 2. Android uygulaması ekleyin; paket adını `android/app/build.gradle*` içindeki `applicationId` ile aynı girin.
-3. İndirilen `google-services.json` dosyasını `android/app/` klasörüne koyun.
+3. Depodaki `android/app/google-services.json` dosyasının Firebase projeniz ve Android uygulamanızla eşleştiğini doğrulayın. Kendi Firebase projenizi kullanıyorsanız Firebase Console'dan indirdiğiniz dosyayla değiştirin.
 4. **Authentication → Sign-in method → Email/Password** yöntemini etkinleştirin.
-5. **Firestore Database** oluşturun. Geliştirme için test modu yeterlidir:
+5. **Firestore Database** oluşturun ve kullanıcı/işletme rollerini, veri sahipliğini ve erişim izinlerini doğrulayan güvenli kurallar tanımlayın. Aşağıdaki basit örnek yalnızca geçici denemeler içindir; herkese açık veya üretim uygulamasında kullanmayın:
    ```
    rules_version = '2';
    service cloud.firestore {
@@ -154,9 +153,10 @@ flutter run
 6. İlk açılışta `assets/data/product.json` içindeki örnek ürünler Firestore'a otomatik yüklenir.
 7. **İşletme hesabı** için kayıt ekranında "İşletme hesabı oluştur" seçeneğini açıp kodu girin: `PROBUY2026` (demo amaçlı, `AuthService.businessCode`).
 
-`.gitignore` içine eklenmesi önerilenler:
+Gizli sunucu kimlik bilgilerini (ör. service account private key) depoya eklemeyin. Bu istemci yapılandırma dosyaları, Firestore güvenlik kurallarının yerine geçmez.
+
+İhtiyaç duymadığınız Firebase yapılandırmalarını `.gitignore` içinde tutabilirsiniz:
 ```
-android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 firebase.json
 .firebaserc
