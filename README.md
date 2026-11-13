@@ -47,23 +47,55 @@ Bu proje, "Mobil Uygulama Geliştirme (Android / iOS)" dersi proje yönergesi ka
 
 ## 📸 Ekran Görüntüleri
 
-> Ekran görüntülerini `docs/screenshots/` klasörüne ekleyip aşağıdaki yolları güncelleyin.
+Görseller, dosya adlarındaki numaralara göre uygulama akışını ve örnek senaryoları takip eder.
 
-| Splash | Giriş | Ana Sayfa |
-|:--:|:--:|:--:|
-| ![Splash](docs/screenshots/01_splash.png) | ![Giriş](docs/screenshots/02_login.png) | ![Ana Sayfa](docs/screenshots/03_home.png) |
+### Açılış ve hesap
 
-| Arama / Filtre | Ürün Detayı | Sepet |
+| 1. Açılış animasyonu | 2. Giriş | 3. Kayıt |
 |:--:|:--:|:--:|
-| ![Filtre](docs/screenshots/04_filter.png) | ![Detay](docs/screenshots/05_detail.png) | ![Sepet](docs/screenshots/06_cart.png) |
+| ![Açılış animasyonu](docs/screenshots/01_splash.gif) | ![Giriş ekranı](docs/screenshots/02_login.png) | ![Kayıt ekranı](docs/screenshots/03_signin.png) |
 
-| Siparişlerim | Puan & Yorum | Profil |
+| 4. İşletme kaydı | 5. Ana sayfa | 6. Arama |
 |:--:|:--:|:--:|
-| ![Siparişler](docs/screenshots/07_orders.png) | ![Yorum](docs/screenshots/08_review.png) | ![Profil](docs/screenshots/09_profile.png) |
+| ![İşletme kayıt ekranı](docs/screenshots/04_signin_businnes.png) | ![Ana sayfadaki ürünler](docs/screenshots/05_home.png) | ![Ürün arama](docs/screenshots/06_search.png) |
 
-| İşletme – Ürünler | İşletme – Ürün Formu | İşletme – Siparişler |
+### Filtreleme ve alışveriş
+
+| 7. Filtre seçenekleri | 8. Filtre sonucu | 9. Ürün detayı |
 |:--:|:--:|:--:|
-| ![İşletme Ürünler](docs/screenshots/10_business_products.png) | ![Form](docs/screenshots/11_business_form.png) | ![İşletme Siparişler](docs/screenshots/12_business_orders.png) |
+| ![Filtre seçenekleri](docs/screenshots/07_filter.png) | ![Filtre uygulanmış ürün listesi](docs/screenshots/08_after_appl_filtery.png) | ![Ürün detay ekranı](docs/screenshots/09_product_detail.png) |
+
+| 10. Sepet | 11. Ödeme | 12. Ödeme simülasyonu sonrası |
+|:--:|:--:|:--:|
+| ![Sepet ekranı](docs/screenshots/10_cart_screen.png) | ![Ödeme ekranı](docs/screenshots/11_payment_page.png) | ![Ödeme simülasyonu sonrası](docs/screenshots/12_after_payment_simulation.png) |
+
+### Sipariş, stok ve hesap
+
+| 13. Siparişler | 13.1. Stok aşımı | 13.2. Tükenen ürün |
+|:--:|:--:|:--:|
+| ![Siparişlerim ekranı](docs/screenshots/13_0_orders.png) | ![Siparişte stok aşımı durumu](docs/screenshots/13_1_order_page_if_stock_exceed.png) | ![Ana sayfada tükenen ürün](docs/screenshots/13_2_home_page_if_no_stock_for_the_product.png) |
+
+| 14. İptal sonrası sipariş | 15. Puan ve yorum | 16. Profil güncelleme |
+|:--:|:--:|:--:|
+| ![İptal sonrası siparişler](docs/screenshots/14_orders_after_cancellation.png) | ![Ürün değerlendirme](docs/screenshots/15_rating.png) | ![Profil ve bilgi güncelleme](docs/screenshots/16_profile_and_update.png) |
+
+| 17. Favoriler | 18. Çıkış |
+|:--:|:--:|
+| ![Favori ürünler](docs/screenshots/17_favorite.png) | ![Çıkış ekranı](docs/screenshots/18_logout.png) |
+
+### İşletme yönetimi ve iptal senaryosu
+
+| 19. Ürün yönetimi | 20. Ürün güncelleme | 21. Ürün ekleme |
+|:--:|:--:|:--:|
+| ![İşletme ürün yönetimi](docs/screenshots/19_product_managment.png) | ![Ürün güncelleme formu](docs/screenshots/20_update_product.png) | ![Ürün ekleme formu](docs/screenshots/21_add_product.png) |
+
+| 22. İşletme siparişleri | 23. Sipariş iptali | 24. İşletmede iptal sonrası |
+|:--:|:--:|:--:|
+| ![İşletme sipariş ekranı](docs/screenshots/22_order_page_for_business.png) | ![İşletmenin sipariş iptal ekranı](docs/screenshots/23_order_page_for_business_if_click_cancel_order.png) | ![İşletme siparişlerinde iptal sonrası](docs/screenshots/24_order_page_for_businnes_if_prdocut_cancel.png) |
+
+| 25. Alıcıda iptal sonrası | 26. İşletmede fiyat değişikliği | 27. Alıcının ana sayfasında fiyat değişikliği |
+|:--:|:--:|:--:|
+| ![İşletme iptalinden sonra alıcı siparişleri](docs/screenshots/25_user_order_page_after_businnes_cancel_the_product.png) | ![İşletmenin ürün fiyatını değiştirmesi](docs/screenshots/26_if_business_change_price_of%20product.png) | ![Fiyat değişikliği sonrası alıcı ana sayfası](docs/screenshots/27_user_home_screen_after_business_change_price_of_product.png) |
 
 ---
 
@@ -194,7 +226,7 @@ Bunlar bir ders projesi olarak bilinçli sadeleştirmelerdir:
 - [x] Depo public: **Evet** *(teslimden önce GitHub → Settings → Danger Zone → "Change visibility" ile kontrol edin)*
 - [x] Depoda güncel ve çalışan kaynak kod var.
 - [x] README proje adı, kısa açıklama, Flutter sürümü (3.47.8) ve çalıştırma adımlarını içeriyor.
-- [ ] Ekran görüntüleri depoya eklendi → `docs/screenshots/` klasörüne yukarıdaki dosya adlarıyla koyun.
+- [ ] Ekran görüntüleri GitHub'a eklendi. Görseller yerel `docs/screenshots/` klasöründe; teslim için commit ve push yapılmalı.
 
 ---
 
