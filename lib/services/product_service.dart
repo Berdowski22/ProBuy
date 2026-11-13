@@ -38,6 +38,7 @@ class ProductService {
     required String category,
     required int stock,
     required List<String> features,
+    required String image,
   }) async {
     final id = await _nextId();
     final user = FirebaseAuth.instance.currentUser;
@@ -55,7 +56,7 @@ class ProductService {
       'description': description,
       'price': price,
       'category': category,
-      'image': '',
+      'image': image,
       'rating': 0.0,
       'stock': stock,
       'features': features,
@@ -71,6 +72,7 @@ class ProductService {
     required String category,
     required int stock,
     required List<String> features,
+    String? image,
   }) async {
     final ref = _collection.doc('$id');
     final current = (await ref.get()).data();
@@ -95,6 +97,7 @@ class ProductService {
       'category': category,
       'stock': stock,
       'features': features,
+      'image': ?image,
       if (oldPrice != null) 'oldPrice': oldPrice,
     });
   }

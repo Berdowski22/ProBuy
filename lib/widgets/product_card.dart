@@ -1,7 +1,13 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 import '../models/product.dart';
 import '../widgets/rating_badge.dart';
+
+// Images uploaded by businesses are stored as "data:" URIs in Firestore.
+final Map<String, Uint8List> _decoded = {};
 
 class ProductImage extends StatelessWidget {
   final String path;
@@ -11,14 +17,17 @@ class ProductImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
-      path,
-      fit: fit,
-      errorBuilder: (_, _, _) => Container(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        child: const Center(child: Icon(Icons.image_not_supported, size: 32)),
-      ),
-    );
+    Widget error(BuildContext c, Object _, StackTrace? _) => Container(
+          color: Theme.of(c).colorScheme.surfaceContainerHighest,
+          child: const Center(child: Icon(Icons.image_not_supported, size: 32)),
+        );
+    if (path.startsWith('data:')) {
+      final bytes = _decoded.putIfAbsent(
+          path, () => base64Decode(path.substring(path.indexOf(',') + 1)));
+      return Image.memory(bytes,
+          fit: fit, gaplessPlayback: true, errorBuilder: error);
+    }
+    return Image.asset(path, fit: fit, errorBuilder: error);
   }
 }
 

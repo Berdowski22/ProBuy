@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../models/product.dart';
 import '../services/product_service.dart';
 import '../widgets/confirm_dialog.dart';
+import '../widgets/product_card.dart';
 
 class ProductFormScreen extends StatefulWidget {
   final Product? product;
@@ -26,8 +30,52 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   late final _features = TextEditingController(
       text: widget.product?.features.join('\n') ?? '');
   bool _saving = false;
+  String? _newImage;
 
   bool get _isEdit => widget.product != null;
+
+  String get _currentImage => _newImage ?? widget.product?.image ?? '';
+
+  Future<void> _pickImage() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Galeriden seç'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_camera_outlined),
+              title: const Text('Fotoğraf çek'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null) return;
+    try {
+      // Downscaled so the encoded image stays well below Firestore's 1 MB limit.
+      final file = await ImagePicker().pickImage(
+        source: source,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 70,
+      );
+      if (file == null) return;
+      final bytes = await file.readAsBytes();
+      setState(
+          () => _newImage = 'data:image/jpeg;base64,${base64Encode(bytes)}');
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Fotoğraf alınamadı: $e')));
+    }
+  }
 
   @override
   void dispose() {
@@ -39,6 +87,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_currentImage.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Lütfen ürün fotoğrafı ekleyin.')));
+      return;
+    }
     final ok = await confirmAction(
       context,
       title: _isEdit ? 'Ürünü güncelle' : 'Ürünü ekle',
@@ -71,6 +124,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           category: _category.text.trim(),
           stock: stock,
           features: features,
+          image: _newImage,
         );
       } else {
         await service.addProduct(
@@ -80,6 +134,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           category: _category.text.trim(),
           stock: stock,
           features: features,
+          image: _currentImage,
         );
       }
       messenger.showSnackBar(SnackBar(
@@ -106,6 +161,42 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              InkWell(
+                onTap: _saving ? null : _pickImage,
+                child: AspectRatio(
+                  aspectRatio: 1.6,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: _currentImage.isEmpty
+                        ? const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.add_a_photo_outlined, size: 40),
+                              SizedBox(height: 8),
+                              Text('Ürün fotoğrafı ekle'),
+                            ],
+                          )
+                        : Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              ProductImage(path: _currentImage),
+                              const Positioned(
+                                right: 8,
+                                bottom: 8,
+                                child: CircleAvatar(
+                                  child: Icon(Icons.edit),
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _name,
                 textInputAction: TextInputAction.next,
