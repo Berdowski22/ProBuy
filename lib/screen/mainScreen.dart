@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../models/cart_item.dart';
@@ -17,6 +19,25 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   final _cartService = CartService();
+  late final Stream<List<CartItem>> _cartStream = _cartService.watchCart();
+  StreamSubscription<String>? _noticeSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _noticeSub = CartService.notices.listen((message) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(message)));
+    });
+  }
+
+  @override
+  void dispose() {
+    _noticeSub?.cancel();
+    super.dispose();
+  }
 
   late final List<Widget> _pages = [
     const Home(),
@@ -62,7 +83,7 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _cartIcon(IconData icon) {
     return StreamBuilder<List<CartItem>>(
-      stream: _cartService.watchCart(),
+      stream: _cartStream,
       builder: (context, snapshot) {
         final count =
             (snapshot.data ?? []).fold<int>(0, (sum, i) => sum + i.quantity);

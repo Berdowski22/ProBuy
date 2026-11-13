@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -28,14 +30,87 @@ class CartService {
   DocumentReference<Map<String, dynamic>> _productRef(int id) =>
       _db.collection('products').doc('$id');
 
+  // Cart documents hold a snapshot of the product, so live product data
+  // (stock, price, name) is merged in. Items exceeding the live stock are
+  // reconciled automatically and reported through [notices].
   Stream<List<CartItem>> watchCart() {
-    return _cart.snapshots().map((snapshot) {
-      final items =
-          snapshot.docs.map((d) => CartItem.fromJson(d.data())).toList();
+    late final StreamController<List<CartItem>> controller;
+    StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? cartSub;
+    StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? productSub;
+    List<Map<String, dynamic>>? cartData;
+    Map<String, Map<String, dynamic>>? liveProducts;
+
+    void emit() {
+      final carts = cartData;
+      final live = liveProducts;
+      if (carts == null || live == null) return;
+      final items = <CartItem>[];
+      for (final entry in carts) {
+        final id = entry['id'].toString();
+        final merged = {...entry, ...?live[id]};
+        final item = CartItem.fromJson(merged);
+        items.add(item);
+        if (live[id] == null || item.quantity > item.product.stock) {
+          _reconcile(item.product.id);
+        }
+      }
       items.sort((a, b) => a.product.id.compareTo(b.product.id));
-      return items;
-    });
+      controller.add(items);
+    }
+
+    controller = StreamController<List<CartItem>>(
+      onListen: () {
+        cartSub = _cart.snapshots().listen((s) {
+          cartData = s.docs.map((d) => d.data()).toList();
+          emit();
+        }, onError: controller.addError);
+        productSub = _db.collection('products').snapshots().listen((s) {
+          liveProducts = {for (final d in s.docs) d.id: d.data()};
+          emit();
+        }, onError: controller.addError);
+      },
+      onCancel: () async {
+        await cartSub?.cancel();
+        await productSub?.cancel();
+      },
+    );
+    return controller.stream;
   }
+
+  final Set<int> _reconciling = {};
+
+  Future<void> _reconcile(int productId) async {
+    if (!_reconciling.add(productId)) return;
+    try {
+      final cartRef = _cart.doc('$productId');
+      final productRef = _productRef(productId);
+      final notice = await _db.runTransaction<String?>((tx) async {
+        final cartSnap = await tx.get(cartRef);
+        final productSnap = await tx.get(productRef);
+        final cartDoc = cartSnap.data();
+        if (cartDoc == null) return null;
+        final quantity = (cartDoc['quantity'] as int?) ?? 0;
+        final stock = (productSnap.data()?['stock'] as int?) ?? 0;
+        final name = cartDoc['name'];
+        if (quantity <= stock) return null;
+        if (stock <= 0) {
+          tx.delete(cartRef);
+          return '$name tükendiği için sepetinizden çıkarıldı.';
+        }
+        tx.update(cartRef, {'quantity': stock});
+        return '$name stoğu azaldı, adet $stock olarak güncellendi.';
+      });
+      if (notice != null) _notices.add(notice);
+    } catch (_) {
+      // Retried on the next snapshot.
+    } finally {
+      _reconciling.remove(productId);
+    }
+  }
+
+  static final StreamController<String> _notices =
+      StreamController<String>.broadcast();
+  static Stream<String> get notices => _notices.stream;
 
   Stream<Set<int>> watchFavoriteIds() {
     return _favorites

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
+import '../widgets/confirm_dialog.dart';
 import 'authScreen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -58,6 +59,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    final ok = await confirmAction(
+      context,
+      title: 'Değişiklikleri kaydet',
+      message: 'Profil bilgilerinizi kaydetmek istediğinizden emin misiniz?',
+      confirmText: 'Kaydet',
+      icon: Icons.save_outlined,
+    );
+    if (!ok || !mounted) return;
     setState(() => _saving = true);
     try {
       await _authService.updateProfile(
@@ -85,6 +94,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _logout() async {
+    final ok = await confirmAction(
+      context,
+      title: 'Çıkış yap',
+      message: 'Hesabınızdan çıkış yapmak istediğinizden emin misiniz?',
+      confirmText: 'Çıkış Yap',
+      icon: Icons.logout,
+    );
+    if (!ok || !mounted) return;
     final navigator = Navigator.of(context);
     await _authService.logout();
     navigator.pushAndRemoveUntil(

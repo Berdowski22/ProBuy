@@ -41,6 +41,11 @@ class ProductGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cart = CartService();
+    // Out-of-stock products go to the bottom; relative order is preserved.
+    final sorted = [
+      ...products.where((p) => p.stock > 0),
+      ...products.where((p) => p.stock <= 0),
+    ];
     return GridView.builder(
       padding: const EdgeInsets.all(8),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -49,9 +54,9 @@ class ProductGrid extends StatelessWidget {
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
       ),
-      itemCount: products.length,
+      itemCount: sorted.length,
       itemBuilder: (context, index) {
-        final product = products[index];
+        final product = sorted[index];
         final isFavorite = favoriteIds.contains(product.id);
         return ProductCard(
           product: product,
