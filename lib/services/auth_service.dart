@@ -50,6 +50,43 @@ class AuthService {
 
   Future<void> logout() => _auth.signOut();
 
+  Future<Map<String, dynamic>> getProfile() async {
+    final user = _auth.currentUser;
+    if (user == null) return {};
+    final doc = await _db.collection('users').doc(user.uid).get();
+    return doc.data() ?? {};
+  }
+
+  Future<void> updateProfile({
+    required String name,
+    required String phone,
+    required String address,
+  }) async {
+    final user = _auth.currentUser;
+    if (user == null) throw AuthException('Oturum bulunamadı.');
+    try {
+      await user.updateDisplayName(name.trim());
+      await _db.collection('users').doc(user.uid).set({
+        'name': name.trim(),
+        'phone': phone.trim(),
+        'address': address.trim(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } on FirebaseException catch (e) {
+      throw AuthException('Profil güncellenemedi: ${e.code}');
+    }
+  }
+
+  Future<void> sendPasswordReset() async {
+    final email = _auth.currentUser?.email;
+    if (email == null) throw AuthException('Oturum bulunamadı.');
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      throw AuthException(_message(e));
+    }
+  }
+
   String _message(FirebaseAuthException e) {
     switch (e.code) {
       case 'email-already-in-use':
