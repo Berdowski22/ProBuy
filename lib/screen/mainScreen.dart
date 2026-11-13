@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+
+import '../models/cart_item.dart';
+import '../services/cart_service.dart';
+import 'cartScreen.dart';
+import 'favoritesScreen.dart';
 import 'homeScreen.dart';
 import 'profileScreen.dart';
 
@@ -11,11 +16,13 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  final _cartService = CartService();
 
-  static const List<Widget> _pages = [
-    Home(),
-    Center(child: Text('Sepet')),
-    ProfileScreen(),
+  late final List<Widget> _pages = [
+    const Home(),
+    const FavoritesScreen(),
+    CartScreen(onGoToProfile: () => setState(() => _selectedIndex = 3)),
+    const ProfileScreen(),
   ];
 
   @override
@@ -27,24 +34,44 @@ class _MainScreenState extends State<MainScreen> {
         onDestinationSelected: (index) {
           setState(() => _selectedIndex = index);
         },
-        destinations: const [
-          NavigationDestination(
+        destinations: [
+          const NavigationDestination(
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home),
             label: 'Ana Sayfa',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.shopping_cart_outlined),
-            selectedIcon: Icon(Icons.shopping_cart),
-            label: 'Sepet',
+          const NavigationDestination(
+            icon: Icon(Icons.favorite_border),
+            selectedIcon: Icon(Icons.favorite),
+            label: 'Favoriler',
           ),
           NavigationDestination(
+            icon: _cartIcon(Icons.shopping_cart_outlined),
+            selectedIcon: _cartIcon(Icons.shopping_cart),
+            label: 'Sepet',
+          ),
+          const NavigationDestination(
             icon: Icon(Icons.person_outline),
             selectedIcon: Icon(Icons.person),
             label: 'Profil',
           ),
         ],
       ),
+    );
+  }
+
+  Widget _cartIcon(IconData icon) {
+    return StreamBuilder<List<CartItem>>(
+      stream: _cartService.watchCart(),
+      builder: (context, snapshot) {
+        final count =
+            (snapshot.data ?? []).fold<int>(0, (sum, i) => sum + i.quantity);
+        return Badge(
+          isLabelVisible: count > 0,
+          label: Text('$count'),
+          child: Icon(icon),
+        );
+      },
     );
   }
 }

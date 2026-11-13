@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../models/product.dart';
+import '../services/cart_service.dart';
 import '../services/product_service.dart';
+import '../widgets/product_grid.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -12,7 +14,9 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final _productService = ProductService();
+  final _cartService = CartService();
   late final Stream<List<Product>> _products;
+  late final Stream<Set<int>> _favorites;
 
   @override
   void initState() {
@@ -21,6 +25,7 @@ class _HomeState extends State<Home> {
       debugPrint('Seed error: $e');
     });
     _products = _productService.watchProducts();
+    _favorites = _cartService.watchFavoriteIds();
   }
 
   @override
@@ -29,65 +34,24 @@ class _HomeState extends State<Home> {
       appBar: AppBar(title: const Text('Ürünler')),
       body: StreamBuilder<List<Product>>(
         stream: _products,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Ürünler yüklenemedi: ${snapshot.error}'));
+        builder: (context, productSnap) {
+          if (productSnap.hasError) {
+            return Center(
+                child: Text('Ürünler yüklenemedi: ${productSnap.error}'));
           }
-          if (!snapshot.hasData) {
+          if (!productSnap.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
-          final products = snapshot.data!;
+          final products = productSnap.data!;
           if (products.isEmpty) {
             return const Center(child: Text('Henüz ürün yok.'));
           }
-          return GridView.builder(
-            padding: const EdgeInsets.all(8),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 3 / 4,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
+          return StreamBuilder<Set<int>>(
+            stream: _favorites,
+            builder: (context, favSnap) => ProductGrid(
+              products: products,
+              favoriteIds: favSnap.data ?? const {},
             ),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return Card(
-                clipBehavior: Clip.antiAlias,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Image.asset(
-                          product.image,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => const Center(
-                            child: Icon(Icons.image_not_supported, size: 40),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(9),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            product.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 4),
-                          Text('₺${product.price.toStringAsFixed(2)}'),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
           );
         },
       ),
