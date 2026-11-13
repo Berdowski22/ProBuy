@@ -7,6 +7,8 @@ class Product {
   final String image;
   final double rating;
   final int stock;
+  final List<String> features;
+  final Map<String, String> specs;
 
   const Product({
     required this.id,
@@ -17,6 +19,8 @@ class Product {
     required this.image,
     required this.rating,
     required this.stock,
+    this.features = const [],
+    this.specs = const {},
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -29,6 +33,11 @@ class Product {
       image: json['image'] as String,
       rating: (json['rating'] as num).toDouble(),
       stock: json['stock'] as int,
+      features: (json['features'] as List<dynamic>? ?? const [])
+          .map((e) => e.toString())
+          .toList(),
+      specs: (json['specs'] as Map<String, dynamic>? ?? const {})
+          .map((k, v) => MapEntry(k, v.toString())),
     );
   }
 
@@ -41,5 +50,7 @@ class Product {
         'image': image,
         'rating': rating,
         'stock': stock,
+        'features': features,
+        'specs': specs,
       };
 }

@@ -5,6 +5,7 @@ import '../services/auth_service.dart';
 import '../services/cart_service.dart';
 import '../widgets/product_card.dart';
 import 'paymentScreen.dart';
+import 'productDetailScreen.dart';
 
 class CartScreen extends StatelessWidget {
   final VoidCallback? onGoToProfile;
@@ -101,7 +102,16 @@ class _CartTile extends StatelessWidget {
 
     return Card(
       margin: EdgeInsets.zero,
-      child: Padding(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ProductDetailScreen(),
+            settings: RouteSettings(arguments: product),
+          ),
+        ),
+        child: Padding(
         padding: const EdgeInsets.all(10),
         child: Row(
           children: [
@@ -177,6 +187,7 @@ class _CartTile extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/product.dart';
 import '../services/cart_service.dart';
+import '../screen/productDetailScreen.dart';
 import 'product_card.dart';
 
 class ProductGrid extends StatelessWidget {
@@ -55,6 +56,13 @@ class ProductGrid extends StatelessWidget {
         return ProductCard(
           product: product,
           isFavorite: isFavorite,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const ProductDetailScreen(),
+              settings: RouteSettings(arguments: product),
+            ),
+          ),
           onToggleFavorite: () => _run(
             context,
             () => cart.setFavorite(product.id, !isFavorite),

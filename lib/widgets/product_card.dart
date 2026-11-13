@@ -26,6 +26,7 @@ class ProductCard extends StatelessWidget {
   final bool isFavorite;
   final VoidCallback onToggleFavorite;
   final VoidCallback onAddToCart;
+  final VoidCallback? onTap;
 
   const ProductCard({
     super.key,
@@ -33,6 +34,7 @@ class ProductCard extends StatelessWidget {
     required this.isFavorite,
     required this.onToggleFavorite,
     required this.onAddToCart,
+    this.onTap,
   });
 
   @override
@@ -42,77 +44,81 @@ class ProductCard extends StatelessWidget {
 
     return Card(
       clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                ProductImage(path: product.image),
-                if (outOfStock)
-                  Container(
-                    color: Colors.black54,
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Tükendi',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                Positioned(
-                  top: 4,
-                  right: 4,
-                  child: IconButton.filledTonal(
-                    visualDensity: VisualDensity.compact,
-                    tooltip:
-                        isFavorite ? 'Favorilerden çıkar' : 'Favorilere ekle',
-                    icon: Icon(
-                      isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: isFavorite ? Colors.red : null,
-                    ),
-                    onPressed: onToggleFavorite,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 8, 4, 4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        '₺${product.price.toStringAsFixed(2)}',
+      child: InkWell(
+        onTap: onTap,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ProductImage(path: product.image),
+                  if (outOfStock)
+                    Container(
+                      color: Colors.black54,
+                      alignment: Alignment.center,
+                      child: const Text(
+                        'Tükendi',
                         style: TextStyle(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    IconButton.filled(
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: IconButton.filledTonal(
                       visualDensity: VisualDensity.compact,
-                      tooltip: 'Sepete ekle',
-                      icon: const Icon(Icons.add_shopping_cart, size: 20),
-                      onPressed: outOfStock ? null : onAddToCart,
+                      tooltip: isFavorite
+                          ? 'Favorilerden çıkar'
+                          : 'Favorilere ekle',
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.red : null,
+                      ),
+                      onPressed: onToggleFavorite,
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 8, 4, 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '₺${product.price.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      IconButton.filled(
+                        visualDensity: VisualDensity.compact,
+                        tooltip: 'Sepete ekle',
+                        icon: const Icon(Icons.add_shopping_cart, size: 20),
+                        onPressed: outOfStock ? null : onAddToCart,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

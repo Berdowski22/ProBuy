@@ -7,7 +7,22 @@
     "category": "Ses",
     "image": "assets/images/headphones.png",
     "rating": 4.7,
-    "stock": 25
+    "stock": 25,
+    "features": [
+      "Aktif gürültü engelleme (ANC)",
+      "30 saate kadar kesintisiz kullanım",
+      "Katlanabilir ve hafif tasarım",
+      "Çoklu cihaz bağlantısı"
+    ],
+    "specs": {
+      "Bağlantı": "Bluetooth 5.3",
+      "Pil Ömrü": "30 saat (ANC açık)",
+      "Şarj Süresi": "2 saat (USB-C)",
+      "Sürücü": "40 mm dinamik",
+      "Mikrofon": "Çift mikrofon, gürültü önleme",
+      "Ağırlık": "250 g",
+      "Garanti": "2 yıl"
+    }
   },
   {
     "id": 2,
@@ -17,7 +32,22 @@
     "category": "Giyilebilir",
     "image": "assets/images/smartwatch.png",
     "rating": 4.5,
-    "stock": 14
+    "stock": 14,
+    "features": [
+      "Kalp ritmi ve SpO2 ölçümü",
+      "Uyku ve stres takibi",
+      "Dahili GPS",
+      "100+ spor modu"
+    ],
+    "specs": {
+      "Ekran": "1.4 inç AMOLED",
+      "Su Dayanımı": "5 ATM",
+      "Pil Ömrü": "7 gün",
+      "Uyumluluk": "Android 8+ / iOS 14+",
+      "Bağlantı": "Bluetooth 5.2, GPS",
+      "Kasa": "44 mm alüminyum",
+      "Garanti": "2 yıl"
+    }
   },
   {
     "id": 3,
@@ -27,7 +57,22 @@
     "category": "Ses",
     "image": "assets/images/speaker.png",
     "rating": 4.3,
-    "stock": 40
+    "stock": 40,
+    "features": [
+      "360 derece ses",
+      "IPX7 suya dayanıklılık",
+      "12 saat çalma süresi",
+      "İkili hoparlör eşleştirme"
+    ],
+    "specs": {
+      "Bağlantı": "Bluetooth 5.1",
+      "Güç": "20 W",
+      "Pil Ömrü": "12 saat",
+      "Su Dayanımı": "IPX7",
+      "Şarj": "USB-C",
+      "Ağırlık": "540 g",
+      "Garanti": "2 yıl"
+    }
   },
   {
     "id": 4,
@@ -37,7 +82,22 @@
     "category": "Bilgisayar",
     "image": "assets/images/keyboard.png",
     "rating": 4.6,
-    "stock": 18
+    "stock": 18,
+    "features": [
+      "Hot-swap switch desteği",
+      "Tuş başına RGB aydınlatma",
+      "Kablolu ve kablosuz kullanım",
+      "Sessiz yapı (gasket mount)"
+    ],
+    "specs": {
+      "Düzen": "75% (84 tuş), Türkçe Q",
+      "Switch": "Lineer kırmızı",
+      "Bağlantı": "USB-C / Bluetooth 5.0",
+      "Pil": "4000 mAh",
+      "Tuş Kapağı": "PBT",
+      "Ağırlık": "880 g",
+      "Garanti": "2 yıl"
+    }
   },
   {
     "id": 5,
@@ -47,7 +107,21 @@
     "category": "Bilgisayar",
     "image": "assets/images/mouse.png",
     "rating": 4.4,
-    "stock": 60
+    "stock": 60,
+    "features": [
+      "Sessiz tıklama",
+      "Ergonomik sağ el tasarımı",
+      "12 ay pil ömrü",
+      "3 cihaza kadar eşleştirme"
+    ],
+    "specs": {
+      "Sensör": "Optik, 4000 DPI",
+      "Bağlantı": "2.4 GHz alıcı / Bluetooth",
+      "Pil": "1 x AA",
+      "Tuş Sayısı": "6",
+      "Ağırlık": "95 g",
+      "Garanti": "2 yıl"
+    }
   },
   {
     "id": 6,
@@ -57,7 +131,22 @@
     "category": "Tablet",
     "image": "assets/images/tablet.png",
     "rating": 4.2,
-    "stock": 9
+    "stock": 9,
+    "features": [
+      "10.4 inç 2K ekran",
+      "Dörtlü hoparlör",
+      "Hızlı şarj desteği",
+      "Kalem desteği"
+    ],
+    "specs": {
+      "Ekran": "10.4 inç, 2000x1200",
+      "Depolama": "128 GB (microSD destekli)",
+      "RAM": "4 GB",
+      "Pil": "7040 mAh",
+      "İşletim Sistemi": "Android 14",
+      "Kamera": "8 MP arka / 5 MP ön",
+      "Garanti": "2 yıl"
+    }
   },
   {
     "id": 7,
@@ -67,7 +156,21 @@
     "category": "Aksesuar",
     "image": "assets/images/powerbank.png",
     "rating": 4.5,
-    "stock": 35
+    "stock": 35,
+    "features": [
+      "65W hızlı şarj",
+      "Dizüstü bilgisayar şarjı",
+      "Dijital pil göstergesi",
+      "Aşırı ısınma koruması"
+    ],
+    "specs": {
+      "Kapasite": "20000 mAh",
+      "Çıkış": "2 x USB-C (65W), 1 x USB-A",
+      "Giriş": "USB-C 45W",
+      "Boyut": "150 x 70 x 28 mm",
+      "Ağırlık": "430 g",
+      "Garanti": "2 yıl"
+    }
   },
   {
     "id": 8,
@@ -77,6 +180,20 @@
     "category": "Bilgisayar",
     "image": "assets/images/webcam.png",
     "rating": 4.1,
-    "stock": 22
+    "stock": 22,
+    "features": [
+      "1080p / 30 FPS",
+      "Otomatik odaklama",
+      "Çift mikrofon",
+      "Gizlilik kapağı"
+    ],
+    "specs": {
+      "Çözünürlük": "1920x1080",
+      "Görüş Açısı": "90 derece",
+      "Bağlantı": "USB-A (tak ve çalıştır)",
+      "Mikrofon": "Çift, gürültü azaltmalı",
+      "Uyumluluk": "Windows, macOS, Linux",
+      "Garanti": "2 yıl"
+    }
   }
 ]
