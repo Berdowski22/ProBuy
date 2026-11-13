@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "193477199508",
+    "project_id": "probuy-1b9da",
+    "storage_bucket": "probuy-1b9da.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:193477199508:android:28df0f84631c07e823d681",
+        "android_client_info": {
+          "package_name": "com.example.mini_cotolog_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxcFNYykd9UtQpb14kGTsCqESTNOIPmc8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
