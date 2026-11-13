@@ -2,6 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum ShippingStage { received, preparing, shipped, delivered }
 
+const stageLabels = {
+  ShippingStage.received: 'Sipariş Alındı',
+  ShippingStage.preparing: 'Hazırlanıyor',
+  ShippingStage.shipped: 'Kargoya Verildi',
+  ShippingStage.delivered: 'Teslim Edildi',
+};
+
+String formatOrderDate(DateTime? d) {
+  if (d == null) return '-';
+  String two(int n) => n.toString().padLeft(2, '0');
+  return '${two(d.day)}.${two(d.month)}.${d.year} ${two(d.hour)}:${two(d.minute)}';
+}
+
 class OrderItem {
   final int productId;
   final String name;
@@ -39,6 +52,10 @@ class Order {
   final String address;
   final String carrier;
   final String trackingNo;
+  final String buyerUid;
+  final String? cancelledBy;
+  final String? cancelReason;
+  final Set<int> reviewedProductIds;
 
   const Order({
     required this.id,
@@ -51,12 +68,23 @@ class Order {
     required this.address,
     required this.carrier,
     required this.trackingNo,
+    required this.buyerUid,
+    this.cancelledBy,
+    this.cancelReason,
+    this.reviewedProductIds = const {},
   });
 
   factory Order.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data()!;
     return Order(
       id: doc.id,
+      buyerUid: doc.reference.parent.parent?.id ?? '',
+      cancelledBy: data['cancelledBy'] as String?,
+      cancelReason: data['cancelReason'] as String?,
+      reviewedProductIds: ((data['reviewed'] as Map<String, dynamic>?) ?? {})
+          .keys
+          .map(int.parse)
+          .toSet(),
       items: (data['items'] as List<dynamic>)
           .map((e) => OrderItem.fromMap(e as Map<String, dynamic>))
           .toList(),

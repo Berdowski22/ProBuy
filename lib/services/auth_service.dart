@@ -15,10 +15,14 @@ class AuthService {
 
   User? get currentUser => _auth.currentUser;
 
+  // Demo gate: business accounts need this code at registration.
+  static const businessCode = 'PROBUY2026';
+
   Future<void> register({
     required String name,
     required String email,
     required String password,
+    bool business = false,
   }) async {
     try {
       final credential = await _auth.createUserWithEmailAndPassword(
@@ -30,6 +34,7 @@ class AuthService {
       await _db.collection('users').doc(user.uid).set({
         'name': name.trim(),
         'email': user.email,
+        'role': business ? 'business' : 'customer',
         'createdAt': FieldValue.serverTimestamp(),
       });
     } on FirebaseAuthException catch (e) {
@@ -49,6 +54,11 @@ class AuthService {
   }
 
   Future<void> logout() => _auth.signOut();
+
+  Future<bool> isBusiness() async {
+    final profile = await getProfile();
+    return profile['role'] == 'business';
+  }
 
   Future<Map<String, dynamic>> getProfile() async {
     final user = _auth.currentUser;

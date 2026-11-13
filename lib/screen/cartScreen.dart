@@ -135,7 +135,32 @@ class _CartTile extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 2),
-                  Text('₺${product.price.toStringAsFixed(2)} / adet'),
+                  Text('Satıcı: ${product.sellerName}',
+                      style: Theme.of(context).textTheme.bodySmall),
+                  Row(
+                    children: [
+                      Text('₺${product.price.toStringAsFixed(2)} / adet'),
+                      if (product.hasDiscount) ...[
+                        const SizedBox(width: 6),
+                        Text(
+                          '₺${product.oldPrice!.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '%${product.discountPercent} indirim',
+                          style: TextStyle(
+                              color: Colors.red.shade700,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ],
+                  ),
                   const SizedBox(height: 6),
                   Row(
                     children: [

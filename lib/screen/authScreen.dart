@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
-import 'mainScreen.dart';
+import 'homeRouter.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -19,6 +19,8 @@ class _AuthScreenState extends State<AuthScreen> {
   final _authService = AuthService();
 
   bool _isLogin = true;
+  bool _business = false;
+  final _codeController = TextEditingController();
   bool _obscure = true;
   bool _loading = false;
   String? _error;
@@ -28,6 +30,7 @@ class _AuthScreenState extends State<AuthScreen> {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _codeController.dispose();
     super.dispose();
   }
 
@@ -48,12 +51,14 @@ class _AuthScreenState extends State<AuthScreen> {
           name: _nameController.text,
           email: _emailController.text,
           password: _passwordController.text,
+          business: _business,
         );
       }
+      final home = await resolveHome();
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const MainScreen()),
+        MaterialPageRoute(builder: (_) => home),
       );
     } on AuthException catch (e) {
       setState(() => _error = e.message);
@@ -151,6 +156,27 @@ class _AuthScreenState extends State<AuthScreen> {
                       return null;
                     },
                   ),
+                  if (!_isLogin) ...[
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('İşletme hesabı oluştur'),
+                      value: _business,
+                      onChanged: (v) => setState(() => _business = v),
+                    ),
+                    if (_business)
+                      TextFormField(
+                        controller: _codeController,
+                        decoration: const InputDecoration(
+                          labelText: 'İşletme kodu',
+                          prefixIcon: Icon(Icons.vpn_key_outlined),
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (v) =>
+                            (v?.trim() == AuthService.businessCode)
+                                ? null
+                                : 'Geçersiz işletme kodu',
+                      ),
+                  ],
                   if (_error != null) ...[
                     const SizedBox(height: 12),
                     Text(

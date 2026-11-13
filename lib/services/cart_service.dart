@@ -47,7 +47,7 @@ class CartService {
       final items = <CartItem>[];
       for (final entry in carts) {
         final id = entry['id'].toString();
-        final merged = {...entry, ...?live[id]};
+        final merged = {...entry, 'oldPrice': null, ...?live[id]};
         final item = CartItem.fromJson(merged);
         items.add(item);
         if (live[id] == null || item.quantity > item.product.stock) {

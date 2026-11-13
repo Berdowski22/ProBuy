@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../services/cart_service.dart';
 import '../services/product_service.dart';
+import '../services/review_service.dart';
 import '../widgets/product_card.dart';
+import '../widgets/rating_badge.dart';
 
 // Receives the Product through RouteSettings.arguments.
 class ProductDetailScreen extends StatefulWidget {
@@ -144,15 +146,44 @@ class _Body extends StatelessWidget {
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              _RatingRow(rating: product.rating),
+              _RatingRow(rating: product.rating, count: product.ratingCount),
               const SizedBox(height: 12),
-              Text(
-                '₺${product.price.toStringAsFixed(2)}',
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '₺${product.price.toStringAsFixed(2)}',
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      color: product.hasDiscount
+                          ? Colors.red.shade700
+                          : colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (product.hasDiscount) ...[
+                    const SizedBox(width: 10),
+                    Text(
+                      '₺${product.oldPrice!.toStringAsFixed(2)}',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Chip(
+                      label: Text('%${product.discountPercent} İNDİRİM'),
+                      backgroundColor: Colors.red.shade700,
+                      labelStyle: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                      visualDensity: VisualDensity.compact,
+                      side: BorderSide.none,
+                    ),
+                  ],
+                ],
               ),
+              const SizedBox(height: 4),
+              Text('Satıcı: ${product.sellerName}',
+                  style: theme.textTheme.bodyMedium),
               const SizedBox(height: 8),
               _StockInfo(stock: product.stock),
               const SizedBox(height: 20),
@@ -230,6 +261,8 @@ class _Body extends StatelessWidget {
                           text: 'Resmi garanti')),
                 ],
               ),
+              const SizedBox(height: 20),
+              _ReviewsSection(productId: product.id),
             ],
           ),
         ),
@@ -240,11 +273,13 @@ class _Body extends StatelessWidget {
 
 class _RatingRow extends StatelessWidget {
   final double rating;
+  final int count;
 
-  const _RatingRow({required this.rating});
+  const _RatingRow({required this.rating, required this.count});
 
   @override
   Widget build(BuildContext context) {
+    final color = ratingColor(rating);
     return Row(
       children: [
         for (var i = 1; i <= 5; i++)
@@ -252,13 +287,70 @@ class _RatingRow extends StatelessWidget {
             rating >= i
                 ? Icons.star
                 : (rating >= i - 0.5 ? Icons.star_half : Icons.star_border),
-            color: Colors.amber,
+            color: color,
             size: 22,
           ),
         const SizedBox(width: 8),
-        Text(rating.toStringAsFixed(1),
-            style: const TextStyle(fontWeight: FontWeight.w600)),
+        RatingBadge(rating: rating),
+        if (count > 0) ...[
+          const SizedBox(width: 8),
+          Text('$count değerlendirme'),
+        ],
       ],
+    );
+  }
+}
+
+class _ReviewsSection extends StatelessWidget {
+  final int productId;
+
+  const _ReviewsSection({required this.productId});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return StreamBuilder<List<Review>>(
+      stream: ReviewService().watchReviews(productId),
+      builder: (context, snapshot) {
+        final reviews = snapshot.data ?? const <Review>[];
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Yorumlar (${reviews.length})',
+                style: theme.textTheme.titleMedium),
+            const SizedBox(height: 6),
+            if (reviews.isEmpty)
+              const Text('Henüz yorum yapılmamış.')
+            else
+              for (final r in reviews)
+                Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(r.userName,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w600)),
+                            ),
+                            RatingBadge(rating: r.rating.toDouble()),
+                          ],
+                        ),
+                        if (r.comment.isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          Text(r.comment),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+          ],
+        );
+      },
     );
   }
 }

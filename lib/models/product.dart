@@ -9,6 +9,11 @@ class Product {
   final int stock;
   final List<String> features;
   final Map<String, String> specs;
+  final int ratingCount;
+  final String sellerName;
+  final String? sellerId;
+  // Set only while the price is discounted (the price before the drop).
+  final double? oldPrice;
 
   const Product({
     required this.id,
@@ -21,7 +26,18 @@ class Product {
     required this.stock,
     this.features = const [],
     this.specs = const {},
+    this.ratingCount = 0,
+    this.sellerName = defaultSeller,
+    this.sellerId,
+    this.oldPrice,
   });
+
+  static const defaultSeller = 'ProBuy';
+
+  bool get hasDiscount => oldPrice != null && oldPrice! > price;
+
+  int get discountPercent =>
+      hasDiscount ? (((oldPrice! - price) / oldPrice!) * 100).round() : 0;
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
@@ -38,6 +54,10 @@ class Product {
           .toList(),
       specs: (json['specs'] as Map<String, dynamic>? ?? const {})
           .map((k, v) => MapEntry(k, v.toString())),
+      ratingCount: (json['ratingCount'] as num?)?.toInt() ?? 0,
+      sellerName: (json['sellerName'] ?? defaultSeller).toString(),
+      sellerId: json['sellerId'] as String?,
+      oldPrice: (json['oldPrice'] as num?)?.toDouble(),
     );
   }
 
@@ -49,8 +69,12 @@ class Product {
         'category': category,
         'image': image,
         'rating': rating,
+        'ratingCount': ratingCount,
         'stock': stock,
         'features': features,
         'specs': specs,
+        'sellerName': sellerName,
+        if (sellerId != null) 'sellerId': sellerId,
+        if (oldPrice != null) 'oldPrice': oldPrice,
       };
 }

@@ -50,7 +50,7 @@ class ProductGrid extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.68,
+        childAspectRatio: 0.62,
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
       ),

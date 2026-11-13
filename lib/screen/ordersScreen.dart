@@ -6,9 +6,11 @@ import '../models/order.dart';
 import '../services/cart_service.dart';
 import '../services/order_service.dart';
 import '../services/product_service.dart';
+import '../services/review_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/product_card.dart';
+import '../widgets/review_dialog.dart';
 import 'productDetailScreen.dart';
 
 class OrdersScreen extends StatefulWidget {
@@ -110,19 +112,6 @@ class _OrderList extends StatelessWidget {
   }
 }
 
-String _formatDate(DateTime? d) {
-  if (d == null) return '-';
-  String two(int n) => n.toString().padLeft(2, '0');
-  return '${two(d.day)}.${two(d.month)}.${d.year} ${two(d.hour)}:${two(d.minute)}';
-}
-
-const _stageLabels = {
-  ShippingStage.received: 'Sipariş Alındı',
-  ShippingStage.preparing: 'Hazırlanıyor',
-  ShippingStage.shipped: 'Kargoya Verildi',
-  ShippingStage.delivered: 'Teslim Edildi',
-};
-
 class _OrderCard extends StatelessWidget {
   final Order order;
 
@@ -144,6 +133,30 @@ class _OrderCard extends StatelessWidget {
       ));
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Ürün açılamadı: $e')));
+    }
+  }
+
+  Future<void> _review(BuildContext context, OrderItem item) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final result = await showDialog<({int rating, String comment})>(
+      context: context,
+      builder: (_) => ReviewDialog(productName: item.name),
+    );
+    if (result == null) return;
+    try {
+      await ReviewService().submitReview(
+        orderId: order.id,
+        productId: item.productId,
+        rating: result.rating,
+        comment: result.comment,
+        buyerName: order.name,
+      );
+      messenger.showSnackBar(
+          const SnackBar(content: Text('Değerlendirmeniz için teşekkürler!')));
+    } on CartException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(e.message)));
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Gönderilemedi: $e')));
     }
   }
 
@@ -192,7 +205,7 @@ class _OrderCard extends StatelessWidget {
                         'Sipariş #${order.id.substring(0, 8).toUpperCase()}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      Text(_formatDate(order.createdAt),
+                      Text(formatOrderDate(order.createdAt),
                           style: theme.textTheme.bodySmall),
                     ],
                   ),
@@ -201,7 +214,7 @@ class _OrderCard extends StatelessWidget {
               ],
             ),
             const Divider(height: 24),
-            for (final item in order.items)
+            for (final item in order.items) ...[
               InkWell(
                 onTap: () => _openProduct(context, item),
                 child: Padding(
@@ -236,14 +249,54 @@ class _OrderCard extends StatelessWidget {
                   ),
                 ),
               ),
+              if (!order.cancelled && stage == ShippingStage.delivered)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: order.reviewedProductIds.contains(item.productId)
+                      ? Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.check_circle,
+                                  size: 16, color: Colors.green.shade700),
+                              const SizedBox(width: 4),
+                              const Text('Değerlendirdiniz'),
+                            ],
+                          ),
+                        )
+                      : TextButton.icon(
+                          icon: const Icon(Icons.star_outline),
+                          label: const Text('Puan ver & yorum yap'),
+                          onPressed: () => _review(context, item),
+                        ),
+                ),
+            ],
             const Divider(height: 24),
             if (order.cancelled)
               Row(
                 children: [
                   Icon(Icons.cancel, color: theme.colorScheme.error),
                   const SizedBox(width: 8),
-                  const Expanded(
-                      child: Text('Sipariş iptal edildi, ürünler stoğa döndü.')),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          order.cancelledBy == 'business'
+                              ? 'Sipariş işletme tarafından iptal edildi.'
+                              : 'Sipariş iptal edildi, ürünler stoğa döndü.',
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        if (order.cancelledBy == 'business' &&
+                            (order.cancelReason ?? '').isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text('Neden: ${order.cancelReason}'),
+                          ),
+                      ],
+                    ),
+                  ),
                 ],
               )
             else
@@ -318,7 +371,7 @@ class _StatusChip extends StatelessWidget {
       label = 'İptal Edildi';
       color = Theme.of(context).colorScheme.error;
     } else {
-      label = _stageLabels[stage]!;
+      label = stageLabels[stage]!;
       color = stage == ShippingStage.delivered
           ? Colors.green.shade700
           : AppColors.buy;
@@ -391,7 +444,7 @@ class _TrackingBar extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      _stageLabels[s]!,
+                      stageLabels[s]!,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 10,
