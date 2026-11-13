@@ -24,6 +24,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   final _service = OrderService();
   late final Stream<List<Order>> _orders = _service.watchOrders();
   Timer? _ticker;
+  bool _newestFirst = true;
 
   @override
   void initState() {
@@ -42,42 +43,37 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Siparişlerim'),
-          bottom: const TabBar(
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            indicatorColor: AppColors.buy,
-            tabs: [Tab(text: 'Aktif'), Tab(text: 'Geçmiş')],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Siparişlerim'),
+        actions: [
+          IconButton(
+            tooltip: _newestFirst ? 'En yeni üstte' : 'En eski üstte',
+            icon: Icon(_newestFirst
+                ? Icons.arrow_downward
+                : Icons.arrow_upward),
+            onPressed: () => setState(() => _newestFirst = !_newestFirst),
           ),
-        ),
-        body: StreamBuilder<List<Order>>(
-          stream: _orders,
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Center(
-                  child: Text('Siparişler yüklenemedi: ${snapshot.error}'));
-            }
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            final now = DateTime.now();
-            final all = snapshot.data!;
-            final active = all.where((o) => o.isActive(now)).toList();
-            final past = all.where((o) => !o.isActive(now)).toList();
-            return TabBarView(
-              children: [
-                _OrderList(
-                    orders: active, emptyText: 'Aktif siparişiniz yok.'),
-                _OrderList(
-                    orders: past, emptyText: 'Geçmiş siparişiniz yok.'),
-              ],
-            );
-          },
-        ),
+        ],
+      ),
+      body: StreamBuilder<List<Order>>(
+        stream: _orders,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+                child: Text('Siparişler yüklenemedi: ${snapshot.error}'));
+          }
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final orders = [...snapshot.data!];
+          final epoch = DateTime.fromMillisecondsSinceEpoch(0);
+          orders.sort((a, b) {
+            final c = (a.createdAt ?? epoch).compareTo(b.createdAt ?? epoch);
+            return _newestFirst ? -c : c;
+          });
+          return _OrderList(orders: orders, emptyText: 'Henüz siparişiniz yok.');
+        },
       ),
     );
   }

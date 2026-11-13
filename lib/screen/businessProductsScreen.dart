@@ -100,9 +100,15 @@ class _BusinessProductsScreenState extends State<BusinessProductsScreen> {
                         children: [
                           RatingBadge(rating: p.rating),
                           const SizedBox(width: 6),
-                          Text(p.ratingCount > 0
-                              ? '${p.ratingCount} değerlendirme'
-                              : 'Henüz değerlendirme yok'),
+                          Expanded(
+                            child: Text(
+                              p.ratingCount > 0
+                                  ? '${p.ratingCount} değerlendirme'
+                                  : 'Değerlendirme yok',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
                     ],
