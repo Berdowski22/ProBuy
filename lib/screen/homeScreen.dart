@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../services/cart_service.dart';
 import '../services/product_service.dart';
+import '../theme/app_theme.dart';
 import '../widgets/product_grid.dart';
 
 class Home extends StatefulWidget {
@@ -31,7 +32,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Ürünler')),
+      appBar: AppBar(title: const BrandName(fontSize: 22, proColor: Colors.white)),
       body: StreamBuilder<List<Product>>(
         stream: _products,
         builder: (context, productSnap) {

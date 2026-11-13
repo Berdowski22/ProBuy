@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
+import '../theme/app_theme.dart';
 import 'mainScreen.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -78,8 +79,14 @@ class _AuthScreenState extends State<AuthScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Icon(Icons.storefront, size: 72, color: colorScheme.primary),
-                  const SizedBox(height: 12),
+                  const Center(child: BrandName(fontSize: 44)),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Teknolojiyi akıllıca al',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey.shade600),
+                  ),
+                  const SizedBox(height: 24),
                   Text(
                     _isLogin ? 'Giriş Yap' : 'Kayıt Ol',
                     textAlign: TextAlign.center,
