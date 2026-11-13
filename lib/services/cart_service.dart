@@ -156,7 +156,12 @@ class CartService {
   }
 
   // Validates stock, decrements it, records the order and empties the cart atomically.
-  Future<void> placeOrder(List<CartItem> items) async {
+  Future<void> placeOrder(
+    List<CartItem> items, {
+    required String name,
+    required String phone,
+    required String address,
+  }) async {
     if (items.isEmpty) throw CartException('Sepetiniz boş.');
     final orderRef = _userDoc.collection('orders').doc();
     await _db.runTransaction((tx) async {
@@ -185,6 +190,7 @@ class CartService {
           'name': data['name'],
           'price': price,
           'quantity': item.quantity,
+          'image': data['image'],
         });
         tx.update(_productRef(item.product.id),
             {'stock': stock - item.quantity});
@@ -194,6 +200,12 @@ class CartService {
       tx.set(orderRef, {
         'items': orderItems,
         'total': total,
+        'status': 'active',
+        'name': name,
+        'phone': phone,
+        'address': address,
+        'carrier': 'HızlıKargo',
+        'trackingNo': 'HK${orderRef.id.substring(0, 8).toUpperCase()}',
         'createdAt': FieldValue.serverTimestamp(),
       });
     });

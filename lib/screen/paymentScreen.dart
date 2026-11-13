@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/cart_item.dart';
 import '../services/auth_service.dart';
 import '../services/cart_service.dart';
+import 'ordersScreen.dart';
 
 class PaymentScreen extends StatefulWidget {
   final List<CartItem> items;
@@ -31,24 +32,44 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     try {
-      await CartService().placeOrder(widget.items);
+      final profile = await AuthService().getProfile();
+      final address = (profile['address'] ?? '').toString().trim();
+      if (address.isEmpty) {
+        throw CartException('Teslimat adresi bulunamadı. Profilinize adres ekleyin.');
+      }
+      await CartService().placeOrder(
+        widget.items,
+        name: (profile['name'] ?? '').toString(),
+        phone: (profile['phone'] ?? '').toString(),
+        address: address,
+      );
       if (!mounted) return;
-      await showDialog<void>(
+      final viewOrders = await showDialog<bool>(
         context: context,
         barrierDismissible: false,
-        builder: (_) => AlertDialog(
+        builder: (ctx) => AlertDialog(
           icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
           title: const Text('Siparişiniz alındı'),
           content: const Text('Bu bir simülasyondur, gerçek ödeme alınmadı.'),
           actions: [
-            FilledButton(
-              onPressed: () => Navigator.pop(context),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
               child: const Text('Tamam'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Siparişlerim'),
             ),
           ],
         ),
       );
-      navigator.pop();
+      if (viewOrders == true) {
+        navigator.pushReplacement(
+          MaterialPageRoute(builder: (_) => const OrdersScreen()),
+        );
+      } else {
+        navigator.pop();
+      }
     } on CartException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e) {

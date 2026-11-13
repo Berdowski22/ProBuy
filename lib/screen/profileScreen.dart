@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../widgets/confirm_dialog.dart';
 import 'authScreen.dart';
+import 'ordersScreen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -194,6 +195,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           : const Icon(Icons.save),
                       label: const Text('Kaydet'),
                       onPressed: _saving ? null : _save,
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.local_shipping_outlined),
+                      label: const Text('Siparişlerim'),
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const OrdersScreen()),
+                      ),
                     ),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
