@@ -11,11 +11,26 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1400),
+  );
+  late final Animation<double> _fall = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.bounceOut,
+  );
+  late final Animation<double> _fade = CurvedAnimation(
+    parent: _controller,
+    curve: const Interval(0, 0.2, curve: Curves.easeIn),
+  );
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
+    _controller.forward();
+    Future.delayed(const Duration(milliseconds: 2800), () {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
@@ -29,7 +44,19 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    const fontSize = 40.0;
+    const style = TextStyle(
+      fontSize: fontSize,
+      fontWeight: FontWeight.w900,
+      letterSpacing: 0.5,
+    );
     return Scaffold(
       backgroundColor: AppColors.pro,
       body: Center(
@@ -38,7 +65,26 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             const Icon(Icons.shopping_bag, size: 96, color: AppColors.buy),
             const SizedBox(height: 16),
-            const BrandName(fontSize: 40, proColor: Colors.white),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Pro', style: style.copyWith(color: Colors.white)),
+                AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) => Opacity(
+                    opacity: _fade.value,
+                    child: Transform.translate(
+                      offset: Offset(0, -260 * (1 - _fall.value)),
+                      child: child,
+                    ),
+                  ),
+                  child: Text(
+                    'Buy',
+                    style: style.copyWith(color: AppColors.buy),
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 8),
             const Text(
               'Teknolojiyi akıllıca al',
