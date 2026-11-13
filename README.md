@@ -222,12 +222,6 @@ Bunlar bir ders projesi olarak bilinçli sadeleştirmelerdir:
 | Basit sepet | ✔ Stok kontrollü, toplam tutarlı |
 | Ekstra | ✔ Auth, favoriler, sipariş, yorum, işletme paneli, arama/filtre |
 
-### GitHub teslimi
-- [x] Depo public: **Evet** *(teslimden önce GitHub → Settings → Danger Zone → "Change visibility" ile kontrol edin)*
-- [x] Depoda güncel ve çalışan kaynak kod var.
-- [x] README proje adı, kısa açıklama, Flutter sürümü (3.47.8) ve çalıştırma adımlarını içeriyor.
-- [ ] Ekran görüntüleri GitHub'a eklendi. Görseller yerel `docs/screenshots/` klasöründe; teslim için commit ve push yapılmalı.
-
 ---
 
 ## 👤 Geliştirici
